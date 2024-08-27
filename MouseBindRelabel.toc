@@ -1,7 +1,7 @@
 ## Interface: 110256
-## Title: Mouse Bind Relabel
+## Title: Mouse Bind Relabel DEV
 ## Author: serious
-## Version: 1.0
+## Version: 1.0-dev
 ## Notes: This addon relabels action bar keybindings, replacing "Mouse Wheel" and its variants with shortened versions like "MW U", "MW D", etc.
 ## Description: 
 ## This addon modifies the labels on action bar buttons to provide a more concise display for mouse keybindings.

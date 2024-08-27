@@ -1,0 +1,102 @@
+name: Release AddOn
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'version-*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          # Extracts semver from tags like 'v1.2.3', 'version-1.2.3', etc.
+          if [[ $GITHUB_REF =~ ([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+            VERSION="${BASH_REMATCH[0]}"
+          else
+            echo "No valid version found in tag"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Update .toc file
+        run: |
+          # Remove 'DEV' from title and set correct version
+          sed -i 's/Title: \(.*\)DEV/Title: \1/' MouseBindRelabel.toc
+          sed -i "s/## Version: .*/## Version: $VERSION/" MouseBindRelabel.toc
+
+      - name: Generate changelog with git-cliff
+        uses: tj-actions/git-cliff@v1.4.2
+        with:
+          args: --latest --strip all
+          output: "CHANGELOG.md"
+
+      - name: Zip the AddOn
+        run: zip -r MouseBindRelabel-${{ env.VERSION }}.zip . -x ".git/*" -x ".github/*" -x "node_modules/*"
+
+      - name: Create release with ncipollo/release-action
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          bodyFile: "CHANGELOG.md"
+          artifacts: "MouseBindRelabel-${{ env.VERSION }}.zip"
+          name: ${{ env.VERSION }}
+          prerelease: ${{ contains(github.ref_name, '-') }}
+
+      - name: Upload to WoWInterface
+        env:
+          WI_API_TOKEN: ${{ secrets.WOWINTERFACE_API_KEY }}
+        run: |
+          curl -X POST -H "x-api-token: $WI_API_TOKEN" -F "archive=@MouseBindRelabel-${{ env.VERSION }}.zip" "https://api.wowinterface.com/addons/update/26820"
+
+      - name: Upload to CurseForge
+        env:
+          CURSEFORGE_API_TOKEN: ${{ secrets.CURSEFORGE_API_TOKEN }}
+        run: |
+          python <<EOF
+          import requests
+
+          api_token = '${{ secrets.CURSEFORGE_API_TOKEN }}'
+          file_path = 'MouseBindRelabel-${{ env.VERSION }}.zip'
+          addon_id = '1091156'  # CurseForge project ID
+
+          headers = { 
+              'x-api-token': api_token
+          }
+
+          # API endpoint
+          url = f'https://wow.curseforge.com/api/projects/{addon_id}/upload-file'
+
+          # Read the file data
+          with open(file_path, 'rb') as file:
+              files = {
+                  'file': (file_path, file)
+              }
+              # Use the generated changelog as part of the upload data
+              with open('CHANGELOG.md', 'r') as changelog_file:
+                  changelog = changelog_file.read()
+              
+              data = {
+                  'changelog': changelog,
+                  'changelogType': 'markdown',
+                  'releaseType': 'release'
+              }
+              
+              response = requests.post(url, headers=headers, files=files, data=data)
+
+              if response.status_code == 200:
+                  print('Upload successful')
+              else:
+                  print('Upload failed')
+                  print(response.text)
+          EOF
