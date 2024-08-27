@@ -40,13 +40,14 @@ jobs:
         run: |
           mv MouseBindRelabel_dev.lua MouseBindRelabel.lua
           mv MouseBindRelabel_dev.toc MouseBindRelabel.toc
-          rm -rf .git* .vscode
+          rm -rf .git* .vscode README.md
           echo "pwd $(pwd)"
           addonPath=$(pwd)
           cd ..
-          mkdir -p MouseBindRelabel
-          cp -r "$addonPath"/* MouseBindRelabel/
-          mv MouseBindRelabel/ "$addonPath"/
+          mkdir -p MouseBindRelabel_tmp
+          cp -r "$addonPath"/* MouseBindRelabel_tmp/
+          mv MouseBindRelabel_tmp "$addonPath"/MouseBindRelabel
+          cd "$addonPath"
 
       - name: Update .toc file
         run: |
