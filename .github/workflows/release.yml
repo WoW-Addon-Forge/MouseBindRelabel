@@ -64,7 +64,7 @@ jobs:
         run: |
           curl -X POST \
             -H "x-api-token: $WI_API_TOKEN" \
-            -F "id=26820" \  # Add the ID parameter here
+            -F "id=26820" \
             -F "version=${{ env.VERSION }}" \
             -F "compatible=11.0.2" \
             -F "updatefile=@MouseBindRelabel-${{ env.VERSION }}.zip" \
