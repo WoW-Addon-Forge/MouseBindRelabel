@@ -36,6 +36,12 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Generate changelog with git-cliff
+        uses: tj-actions/git-cliff@v1.4.2
+        with:
+          args: --latest --strip all
+          output: "CHANGELOG.md"
+
       - name: Prepare files
         run: |
           mv MouseBindRelabel_dev.lua MouseBindRelabel.lua
@@ -48,6 +54,7 @@ jobs:
           cp -r "$addonPath"/* MouseBindRelabel_tmp/
           mv MouseBindRelabel_tmp "$addonPath"/MouseBindRelabel
           cd "$addonPath"
+          mv MouseBindRelabel/CHANGELOG.md .
 
       - name: Update .toc file
         run: |
@@ -57,12 +64,6 @@ jobs:
           sed -i "s/## Version: .*/## Version: $VERSION/" MouseBindRelabel.toc
           sed -i "s/MouseBindRelabel_dev/MouseBindRelabel/" MouseBindRelabel.toc
           cd ..
-
-      - name: Generate changelog with git-cliff
-        uses: tj-actions/git-cliff@v1.4.2
-        with:
-          args: --latest --strip all
-          output: "CHANGELOG.md"
 
       - name: Zip the AddOn
         run: zip -r MouseBindRelabel-${{ env.VERSION }}.zip MouseBindRelabel
