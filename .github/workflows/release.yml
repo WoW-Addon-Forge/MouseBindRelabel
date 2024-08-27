@@ -100,9 +100,8 @@ jobs:
               metadata = {
                   'changelog': changelog,
                   'changelogType': 'markdown',
-                  'displayName': f'Mouse Bind Relabel {${{ env.VERSION }}}',
                   'gameVersions': [11596],
-                  'releaseType': 'release',
+                  'releaseType': 'release'
               }
 
               data = {
