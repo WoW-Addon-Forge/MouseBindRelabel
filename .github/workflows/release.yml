@@ -35,11 +35,22 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Prepare files
+        run: |
+          mv MouseBindRelabel_dev.lua MouseBindRelabel.lua
+          mv MouseBindRelabel_dev.toc MouseBindRelabel.toc
+          rm -r .git* .vscode
+          mkdir -p MouseBindRelabel
+          mv MouseBindRelabel.lua MouseBindRelabel.toc Localization MouseBindRelabel/
+
       - name: Update .toc file
         run: |
+          cd MouseBindRelabel
           # Remove 'DEV' from title and set correct version
           sed -i 's/Title: \(.*\)DEV/Title: \1/' MouseBindRelabel.toc
           sed -i "s/## Version: .*/## Version: $VERSION/" MouseBindRelabel.toc
+          sed -i "s/MouseBindRelabel_dev.lua/MouseBindRelabel.lua/" MouseBindRelabel.toc
+          cd ..
 
       - name: Generate changelog with git-cliff
         uses: tj-actions/git-cliff@v1.4.2
@@ -48,7 +59,7 @@ jobs:
           output: "CHANGELOG.md"
 
       - name: Zip the AddOn
-        run: zip -r MouseBindRelabel-${{ env.VERSION }}.zip . -x ".git/*" -x ".github/*" -x "node_modules/*"
+        run: zip -r MouseBindRelabel-${{ env.VERSION }}.zip MouseBindRelabel
 
       - name: Create release with ncipollo/release-action
         uses: ncipollo/release-action@v1.14.0
