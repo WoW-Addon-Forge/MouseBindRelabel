@@ -12,11 +12,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -40,8 +41,12 @@ jobs:
           mv MouseBindRelabel_dev.lua MouseBindRelabel.lua
           mv MouseBindRelabel_dev.toc MouseBindRelabel.toc
           rm -rf .git* .vscode
+          echo "pwd $(pwd)"
+          addonPath=$(pwd)
+          cd ..
           mkdir -p MouseBindRelabel
-          mv MouseBindRelabel.lua MouseBindRelabel.toc Localization MouseBindRelabel/
+          cp -r "$addonPath"/* MouseBindRelabel/
+          mv MouseBindRelabel/ "$addonPath"/
 
       - name: Update .toc file
         run: |
@@ -62,7 +67,7 @@ jobs:
         run: zip -r MouseBindRelabel-${{ env.VERSION }}.zip MouseBindRelabel
 
       - name: Create release with ncipollo/release-action
-        uses: ncipollo/release-action@v1.14.0
+        uses: ncipollo/release-action@v1
         with:
           bodyFile: "CHANGELOG.md"
           artifacts: "MouseBindRelabel-${{ env.VERSION }}.zip"
