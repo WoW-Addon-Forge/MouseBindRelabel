@@ -39,7 +39,7 @@ jobs:
         run: |
           mv MouseBindRelabel_dev.lua MouseBindRelabel.lua
           mv MouseBindRelabel_dev.toc MouseBindRelabel.toc
-          rm -r .git* .vscode
+          rm -rf .git* .vscode
           mkdir -p MouseBindRelabel
           mv MouseBindRelabel.lua MouseBindRelabel.toc Localization MouseBindRelabel/
 
@@ -49,7 +49,7 @@ jobs:
           # Remove 'DEV' from title and set correct version
           sed -i 's/Title: \(.*\)DEV/Title: \1/' MouseBindRelabel.toc
           sed -i "s/## Version: .*/## Version: $VERSION/" MouseBindRelabel.toc
-          sed -i "s/MouseBindRelabel_dev.lua/MouseBindRelabel.lua/" MouseBindRelabel.toc
+          sed -i "s/MouseBindRelabel_dev/MouseBindRelabel/" MouseBindRelabel.toc
           cd ..
 
       - name: Generate changelog with git-cliff

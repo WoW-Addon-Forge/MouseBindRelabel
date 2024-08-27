@@ -1,10 +1,17 @@
-## Interface: 110256
+## Interface: 100207, 110000, 110002
 ## Title: Mouse Bind Relabel DEV
 ## Author: serious
 ## Version: 1.0-dev
 ## Notes: This addon relabels action bar keybindings, replacing "Mouse Wheel" and its variants with shortened versions like "MW U", "MW D", etc.
-## Icon: Icon.tga
+## Notes-deDE: Dieses Addon benennt die Tastenbelegungen der Aktionsleiste um, indem es "Mausrad" und seine Varianten durch verkürzte Versionen wie "MR O", "MR U" usw. ersetzt.
+## IconTexture: Interface\AddOns\MouseBindRelabel_dev\Icon_64.blp
 ## DefaultState: Enabled
+
+## X-Curse-Project-ID: 1091156
+
+## OptionalDeps:
+## SavedVariables:
+## SavedVariablesPerCharacter:
 
 localization\deDE.lua
 
